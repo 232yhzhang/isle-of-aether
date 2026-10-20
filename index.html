@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#9fc9e2" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta
+      name="description"
+      content="浮空之岛 — 一座悬浮于云海之上的三维秘境，使用 Three.js 实时渲染。"
+    />
+    <title>Isle of Aether · 浮空之岛</title>
+  </head>
+  <body>
+    <canvas id="scene" aria-label="三维浮空岛场景，可拖动环视、滚轮缩放"></canvas>
+
+    <div class="vignette" aria-hidden="true"></div>
+
+    <header class="brand">
+      <span class="brand-mark">✦</span>
+      <span class="brand-line"></span>
+      <span>Aether Archipelago</span>
+    </header>
+
+    <main class="hero">
+      <p class="eyebrow">Floating Realm · No. 07</p>
+      <h1>Isle of <em>Aether</em></h1>
+      <p class="cn">浮 空 之 岛</p>
+      <p class="desc">云海之上，一座被遗忘的岛屿正缓缓呼吸。</p>
+    </main>
+
+    <div class="hint" id="hint" aria-hidden="true">
+      <span class="mouse"></span>
+      <span>拖动环视 · 滚轮缩放</span>
+    </div>
+
+    <nav class="controls" aria-label="场景控制">
+      <button class="ui-btn" id="rotate-toggle" type="button" aria-pressed="true">
+        <span class="ui-dot" aria-hidden="true"></span>
+        自动旋转
+      </button>
+      <button class="ui-btn" id="reset-view" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M4 9V5a1 1 0 0 1 1-1h4M20 15v4a1 1 0 0 1-1 1h-4M15 4h4a1 1 0 0 1 1 1v4M9 20H5a1 1 0 0 1-1-1v-4"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.4"
+            stroke-linecap="round"
+          />
+        </svg>
+        重置视角
+      </button>
+    </nav>
+
+    <div id="loader">
+      <div class="loader-inner">
+        <span class="loader-star">✦</span>
+        <p>正在唤醒浮空之岛</p>
+        <div class="loader-bar"><i></i></div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
