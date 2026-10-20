@@ -1,17 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#061425" />
-      <stop offset="1" stop-color="#0b3244" />
-    </linearGradient>
-    <linearGradient id="neon" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#8ff8ff" />
-      <stop offset="1" stop-color="#ff75d8" />
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#345a72" />
+      <stop offset="0.58" stop-color="#b6cdd8" />
+      <stop offset="1" stop-color="#f2d8bb" />
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="12" fill="url(#bg)" />
-  <circle cx="32" cy="32" r="19" fill="none" stroke="#6ff2ff" stroke-opacity="0.35" />
-  <circle cx="32" cy="32" r="12" fill="none" stroke="#ff75d8" stroke-opacity="0.45" />
-  <path d="M32 12l4.3 15.7L52 32l-15.7 4.3L32 52l-4.3-15.7L12 32l15.7-4.3z" fill="url(#neon)" />
-  <circle cx="32" cy="32" r="2.6" fill="#eaffff" />
+  <rect width="64" height="64" rx="14" fill="url(#bg)" />
+  <circle cx="32" cy="32" r="17" fill="none" stroke="#e8d3b2" stroke-width="1.4" />
+  <path d="M24 42l8-22 8 22M27.4 35h9.2" fill="none" stroke="#f8f3e9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="47" cy="17" r="2" fill="#f5e4c8" />
 </svg>

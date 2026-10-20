@@ -1,61 +1,100 @@
 import * as THREE from 'three';
-import { createWindowTexture, glowTexture } from './utils.js';
+import { createWindowTexture } from './utils.js';
 import { CITY_TOP } from './island.js';
 
-const roofMaterial = new THREE.MeshStandardMaterial({
-  color: 0x0f1724,
-  metalness: 0.8,
-  roughness: 0.36,
+const ivory = new THREE.MeshStandardMaterial({
+  color: 0xe6dfd2,
+  roughness: 0.7,
+  metalness: 0.04,
+  envMapIntensity: 0.65,
 });
 
-const structureMaterial = new THREE.MeshStandardMaterial({
-  color: 0x101a28,
-  metalness: 0.82,
+const paleStone = new THREE.MeshStandardMaterial({
+  color: 0xd3ccbf,
+  roughness: 0.82,
+  metalness: 0.03,
+  envMapIntensity: 0.4,
+});
+
+const silver = new THREE.MeshStandardMaterial({
+  color: 0xbdc3c4,
+  roughness: 0.24,
+  metalness: 0.86,
+  envMapIntensity: 1.3,
+});
+
+const bronze = new THREE.MeshStandardMaterial({
+  color: 0xa4855d,
   roughness: 0.32,
+  metalness: 0.8,
+  envMapIntensity: 1.15,
 });
 
-const neonCyan = new THREE.MeshStandardMaterial({
-  color: 0x04141b,
-  emissive: 0x63f2ff,
-  emissiveIntensity: 2.1,
-  roughness: 0.18,
-  metalness: 0.24,
+const darkMetal = new THREE.MeshStandardMaterial({
+  color: 0x2d3639,
+  roughness: 0.4,
+  metalness: 0.7,
 });
 
-const neonMagenta = new THREE.MeshStandardMaterial({
-  color: 0x1b0718,
-  emissive: 0xff68dc,
-  emissiveIntensity: 1.9,
-  roughness: 0.18,
+const warmLight = new THREE.MeshStandardMaterial({
+  color: 0x4b3b25,
+  emissive: 0xffd8a0,
+  emissiveIntensity: 0.85,
+  roughness: 0.3,
   metalness: 0.2,
 });
 
-const neonAmber = new THREE.MeshStandardMaterial({
-  color: 0x1b1107,
-  emissive: 0xffb45d,
-  emissiveIntensity: 1.7,
-  roughness: 0.2,
-  metalness: 0.2,
+const waterMaterial = new THREE.MeshStandardMaterial({
+  color: 0x22353b,
+  roughness: 0.06,
+  metalness: 0.32,
+  envMapIntensity: 2.2,
 });
 
-const accentMaterials = {
-  cyan: neonCyan,
-  magenta: neonMagenta,
-  amber: neonAmber,
-};
-
-const beaconMaterial = new THREE.MeshStandardMaterial({
-  color: 0x1a0509,
-  emissive: 0xff456d,
-  emissiveIntensity: 1.7,
-  roughness: 0.25,
-  metalness: 0.2,
+const hedgeMaterial = new THREE.MeshStandardMaterial({
+  color: 0x677f5e,
+  roughness: 0.9,
+  metalness: 0,
 });
-const windowTextures = [
-  createWindowTexture(11, ['#26d7f5', '#79f4ff', '#168fc6', '#b8ffff']),
-  createWindowTexture(23, ['#ff45c5', '#ff8ade', '#c16bff', '#ffe6ff']),
-  createWindowTexture(37, ['#ffae45', '#ffd47c', '#ff7b45', '#fff0bd']),
+
+const trunkMaterial = new THREE.MeshStandardMaterial({
+  color: 0x5d4c3c,
+  roughness: 0.95,
+});
+
+const treeMaterials = [
+  new THREE.MeshStandardMaterial({ color: 0x6f8c65, roughness: 0.88 }),
+  new THREE.MeshStandardMaterial({ color: 0x7c9a70, roughness: 0.9 }),
+  new THREE.MeshStandardMaterial({ color: 0x627e5b, roughness: 0.9 }),
 ];
+
+const bridgeGlass = new THREE.MeshStandardMaterial({
+  color: 0xa9c3cc,
+  transparent: true,
+  opacity: 0.26,
+  roughness: 0.08,
+  metalness: 0.25,
+  envMapIntensity: 1.9,
+  side: THREE.DoubleSide,
+  depthWrite: false,
+});
+
+const frostedGlass = new THREE.MeshStandardMaterial({
+  color: 0xc4d6dd,
+  transparent: true,
+  opacity: 0.2,
+  roughness: 0.15,
+  metalness: 0.15,
+  envMapIntensity: 1.6,
+  side: THREE.DoubleSide,
+  depthWrite: false,
+});
+
+const windowTextures = {
+  cool: createWindowTexture(17, 'cool'),
+  warm: createWindowTexture(29, 'warm'),
+  bronze: createWindowTexture(43, 'bronze'),
+};
 
 function cloneWindowTexture(texture, repeatX, repeatY) {
   const clone = texture.clone();
@@ -67,199 +106,402 @@ function cloneWindowTexture(texture, repeatX, repeatY) {
 }
 
 function createFacadeMaterial(texture, width, height) {
-  const repeatX = Math.max(1, Math.round(width / 2.35));
+  const repeatX = Math.max(1, Math.round(width / 2.6));
   const repeatY = Math.max(1, Math.round(height / 5.4));
-  const windowTexture = cloneWindowTexture(texture, repeatX, repeatY);
+  const map = cloneWindowTexture(texture, repeatX, repeatY);
 
   return new THREE.MeshStandardMaterial({
-    color: 0x9fb3c6,
-    map: windowTexture,
-    emissive: 0xffffff,
-    emissiveMap: windowTexture,
-    emissiveIntensity: 1.05,
-    metalness: 0.54,
-    roughness: 0.36,
+    color: 0xffffff,
+    map,
+    emissive: 0xffddb0,
+    emissiveMap: map,
+    emissiveIntensity: 0.48,
+    metalness: 0.52,
+    roughness: 0.09,
+    envMapIntensity: 1.7,
   });
 }
 
-function createFacadeBox(spec, parent, baseY, height, width, depth, palette) {
-  const texture = windowTextures[palette];
+function createTree(scale = 1, random = Math.random) {
+  const group = new THREE.Group();
+
+  const trunk = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.045, 0.075, 0.9, 5),
+    trunkMaterial,
+  );
+  trunk.position.y = 0.45;
+  trunk.castShadow = true;
+  group.add(trunk);
+
+  const blobs = [
+    { x: 0, y: 1.15, z: 0, r: 0.58 },
+    { x: 0.3, y: 1.48, z: 0.12, r: 0.42 },
+    { x: -0.28, y: 1.42, z: -0.12, r: 0.38 },
+  ];
+
+  blobs.forEach((blob, index) => {
+    const canopy = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(blob.r, 1),
+      treeMaterials[Math.floor(random() * treeMaterials.length)],
+    );
+    canopy.position.set(blob.x, blob.y, blob.z);
+    canopy.rotation.set(random() * 2, random() * 2, random() * 2);
+    canopy.castShadow = true;
+    canopy.receiveShadow = true;
+    group.add(canopy);
+  });
+
+  group.scale.setScalar(scale);
+  group.rotation.y = random() * Math.PI * 2;
+  return group;
+}
+
+function createPlanter(width, depth, height = 0.32) {
+  const group = new THREE.Group();
+
+  const box = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), paleStone);
+  box.position.y = height / 2;
+  box.castShadow = true;
+  box.receiveShadow = true;
+  group.add(box);
+
+  const soil = new THREE.Mesh(
+    new THREE.BoxGeometry(width - 0.14, 0.04, depth - 0.14),
+    hedgeMaterial,
+  );
+  soil.position.y = height + 0.01;
+  group.add(soil);
+
+  return group;
+}
+
+function addFacadeBox(parent, baseY, width, depth, height, texture) {
   const sideX = createFacadeMaterial(texture, depth, height);
   const sideZ = createFacadeMaterial(texture, width, height);
-  const geometry = new THREE.BoxGeometry(width, height, depth);
-  const body = new THREE.Mesh(geometry, [
-    sideX,
-    sideX,
-    roofMaterial,
-    roofMaterial,
-    sideZ,
-    sideZ,
-  ]);
+
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(width, height, depth),
+    [sideX, sideX, ivory, ivory, sideZ, sideZ],
+  );
   body.position.y = baseY + height / 2;
   body.castShadow = true;
   body.receiveShadow = true;
   parent.add(body);
 
-  return body;
-}
-
-function createCylinderTower(spec, parent) {
-  const radius = Math.max(spec.w, spec.d) * 0.48;
-  const height = spec.h;
-  const texture = windowTextures[spec.palette];
-  const repeatX = Math.max(2, Math.round((Math.PI * 2 * radius) / 2.6));
-  const repeatY = Math.max(1, Math.round(height / 5.4));
-  const windowTexture = cloneWindowTexture(texture, repeatX, repeatY);
-  const sideMaterial = new THREE.MeshStandardMaterial({
-    color: 0x9fb3c6,
-    map: windowTexture,
-    emissive: 0xffffff,
-    emissiveMap: windowTexture,
-    emissiveIntensity: 1.05,
-    metalness: 0.54,
-    roughness: 0.36,
-  });
-  const geometry = new THREE.CylinderGeometry(
-    radius * 0.72,
-    radius,
-    height,
-    14,
-    1,
-  );
-  const body = new THREE.Mesh(geometry, [sideMaterial, roofMaterial, roofMaterial]);
-  body.position.y = CITY_TOP + height / 2;
-  body.rotation.y = spec.rotation || 0;
-  body.castShadow = true;
-  body.receiveShadow = true;
-  parent.add(body);
-
-  const accent = accentMaterials[spec.accent];
-  [0.3, 0.58, 0.82].forEach((fraction) => {
-    const ringRadius = radius * (1 - fraction * 0.28);
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(ringRadius + 0.03, 0.025, 6, 64),
-      accent,
+  [0.52, 0.79].forEach((fraction) => {
+    const band = new THREE.Mesh(
+      new THREE.BoxGeometry(width + 0.09, 0.055, depth + 0.09),
+      ivory,
     );
-    ring.rotation.x = Math.PI / 2;
-    ring.position.y = CITY_TOP + height * fraction;
-    parent.add(ring);
+    band.position.y = baseY + height * fraction;
+    band.castShadow = true;
+    parent.add(band);
   });
 
   return body;
 }
 
-function createRoofDetails(spec, parent, topY, accent, beacons) {
-  const big = Math.max(spec.w, spec.d);
-  const roofBlock = new THREE.Mesh(
-    new THREE.BoxGeometry(spec.w * 0.58, 0.18, spec.d * 0.58),
-    structureMaterial,
-  );
-  roofBlock.position.y = topY + 0.09;
-  roofBlock.castShadow = true;
-  parent.add(roofBlock);
-
-  if (spec.antenna !== false) {
-    const antennaHeight = spec.antennaHeight || 0.85;
-    const mast = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.025, 0.045, antennaHeight, 5),
-      structureMaterial,
-    );
-    mast.position.y = topY + 0.18 + antennaHeight / 2;
-    parent.add(mast);
-
-    const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.065, 8, 6), beaconMaterial);
-    beacon.position.y = topY + 0.18 + antennaHeight;
-    parent.add(beacon);
-
-    const beaconGlow = new THREE.Sprite(
-      new THREE.SpriteMaterial({
-        map: glowTexture,
-        color: 0xff5c7f,
-        transparent: true,
-        opacity: 0.55,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-        fog: false,
-        toneMapped: false,
-      }),
-    );
-    beaconGlow.position.y = beacon.position.y;
-    beaconGlow.scale.set(0.8, 0.8, 1);
-    parent.add(beaconGlow);
-    beacons.push(beaconGlow);
-  }
-
-  const trim = new THREE.Mesh(
-    new THREE.BoxGeometry(spec.w + 0.1, 0.07, spec.d + 0.1),
-    accent,
-  );
-  trim.position.y = topY - 0.03;
-  parent.add(trim);
-
-  if (big > 1.5) {
-    const cornerStrip = new THREE.Mesh(
-      new THREE.BoxGeometry(0.04, topY - CITY_TOP - 0.2, 0.04),
-      accent,
-    );
-    cornerStrip.position.set(spec.w * 0.42, CITY_TOP + (topY - CITY_TOP) * 0.52, spec.d * 0.42);
-    parent.add(cornerStrip);
-  }
-}
-
-function addBoxTower(spec, cityGroup, beacons) {
+function createFinnedTower(spec) {
   const group = new THREE.Group();
   group.position.set(spec.x, 0, spec.z);
-  cityGroup.add(group);
 
-  const accent = accentMaterials[spec.accent];
-  const totalHeight = spec.h;
+  const glass = new THREE.Mesh(
+    new THREE.CylinderGeometry(spec.radius * 0.82, spec.radius, spec.height, 14, 1),
+    (() => {
+      const material = createFacadeMaterial(
+        windowTextures[spec.mood],
+        Math.PI * 2 * spec.radius,
+        spec.height,
+      );
+      material.metalness = 0.62;
+      material.roughness = 0.075;
+      return material;
+    })(),
+  );
+  glass.position.y = CITY_TOP + spec.height / 2;
+  glass.castShadow = true;
+  glass.receiveShadow = true;
+  group.add(glass);
 
-  if (spec.style === 'stepped') {
-    const lowerHeight = totalHeight * 0.68;
-    const upperHeight = totalHeight * 0.32;
-    createFacadeBox(spec, group, CITY_TOP, lowerHeight, spec.w, spec.d, spec.palette);
-    const trim = new THREE.Mesh(
-      new THREE.BoxGeometry(spec.w + 0.12, 0.08, spec.d + 0.12),
-      accent,
+  const plinth = new THREE.Mesh(
+    new THREE.CylinderGeometry(spec.radius + 0.38, spec.radius + 0.5, 0.32, 20),
+    ivory,
+  );
+  plinth.position.y = CITY_TOP + 0.16;
+  plinth.castShadow = true;
+  plinth.receiveShadow = true;
+  group.add(plinth);
+
+  const whiteFins = 14;
+  const finGeometry = new THREE.BoxGeometry(0.05, spec.height * 0.95, 0.18);
+  for (let index = 0; index < whiteFins; index += 1) {
+    const angle = (index / whiteFins) * Math.PI * 2;
+    const fin = new THREE.Mesh(finGeometry, ivory);
+    fin.position.set(
+      Math.cos(angle) * spec.radius * 0.94,
+      CITY_TOP + spec.height * 0.5,
+      Math.sin(angle) * spec.radius * 0.94,
     );
-    trim.position.y = CITY_TOP + lowerHeight - 0.03;
-    group.add(trim);
-
-    createFacadeBox(
-      { ...spec, w: spec.w * 0.66, d: spec.d * 0.66 },
-      group,
-      CITY_TOP + lowerHeight,
-      upperHeight,
-      spec.w * 0.66,
-      spec.d * 0.66,
-      spec.palette,
-    );
-
-    createRoofDetails(
-      { ...spec, w: spec.w * 0.66, d: spec.d * 0.66 },
-      group,
-      CITY_TOP + totalHeight,
-      accent,
-      beacons,
-    );
-  } else {
-    createFacadeBox(spec, group, CITY_TOP, totalHeight, spec.w, spec.d, spec.palette);
-    createRoofDetails(spec, group, CITY_TOP + totalHeight, accent, beacons);
+    fin.rotation.y = Math.PI / 2 - angle;
+    fin.castShadow = true;
+    group.add(fin);
   }
 
-  if (spec.band) {
-    const band = new THREE.Mesh(
-      new THREE.BoxGeometry(spec.w + 0.08, 0.05, spec.d + 0.08),
-      accent,
-    );
-    band.position.y = CITY_TOP + totalHeight * 0.62;
+  [0.34, 0.62, 0.86].forEach((fraction) => {
+    const radius = spec.radius - spec.radius * 0.18 * fraction + 0.08;
+    const band = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.035, 6, 64), silver);
+    band.rotation.x = Math.PI / 2;
+    band.position.y = CITY_TOP + spec.height * fraction;
     group.add(band);
+  });
+
+  const crown = new THREE.Mesh(
+    new THREE.CylinderGeometry(
+      spec.radius * 0.84,
+      spec.radius * 0.84,
+      0.22,
+      20,
+    ),
+    ivory,
+  );
+  crown.position.y = CITY_TOP + spec.height + 0.11;
+  crown.castShadow = true;
+  group.add(crown);
+
+  const crownLight = new THREE.Mesh(
+    new THREE.TorusGeometry(spec.radius * 0.86, 0.018, 5, 48),
+    warmLight,
+  );
+  crownLight.rotation.x = -Math.PI / 2;
+  crownLight.position.y = CITY_TOP + spec.height + 0.01;
+  group.add(crownLight);
+
+  const roofGarden = new THREE.Group();
+  roofGarden.position.y = CITY_TOP + spec.height + 0.22;
+  const garden = new THREE.Mesh(
+    new THREE.CylinderGeometry(spec.radius * 0.62, spec.radius * 0.62, 0.12, 20),
+    hedgeMaterial,
+  );
+  garden.receiveShadow = true;
+  roofGarden.add(garden);
+  const gardenTree = createTree(0.36);
+  gardenTree.position.set(spec.radius * 0.22, 0.1, -spec.radius * 0.16);
+  roofGarden.add(gardenTree);
+  group.add(roofGarden);
+
+  if (spec.spire) {
+    const mast = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.025, 0.045, 1.25, 5),
+      silver,
+    );
+    mast.position.y = CITY_TOP + spec.height + 0.8;
+    group.add(mast);
+    const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), warmLight);
+    beacon.position.y = CITY_TOP + spec.height + 1.44;
+    group.add(beacon);
   }
 
   return group;
 }
 
-function createBridge(a, b, height, accent) {
+function createSetbackTower(spec) {
+  const group = new THREE.Group();
+  group.position.set(spec.x, 0, spec.z);
+
+  const tiers = [
+    { w: spec.width, d: spec.depth, h: spec.height * 0.46 },
+    { w: spec.width * 0.76, d: spec.depth * 0.76, h: spec.height * 0.32 },
+    { w: spec.width * 0.52, d: spec.depth * 0.52, h: spec.height * 0.22 },
+  ];
+
+  let baseY = CITY_TOP;
+  tiers.forEach((tier, index) => {
+    const body = addFacadeBox(
+      group,
+      baseY,
+      tier.w,
+      tier.d,
+      tier.h,
+      windowTextures[spec.mood],
+    );
+
+    const slab = new THREE.Mesh(
+      new THREE.BoxGeometry(tier.w + 0.1, 0.13, tier.d + 0.1),
+      ivory,
+    );
+    slab.position.y = baseY + tier.h + 0.065;
+    slab.castShadow = true;
+    group.add(slab);
+
+    if (index === 0) {
+      const cornerGeometry = new THREE.BoxGeometry(0.08, tier.h, 0.08);
+      [
+        [-tier.w / 2 + 0.04, -tier.d / 2 + 0.04],
+        [tier.w / 2 - 0.04, -tier.d / 2 + 0.04],
+        [-tier.w / 2 + 0.04, tier.d / 2 - 0.04],
+        [tier.w / 2 - 0.04, tier.d / 2 - 0.04],
+      ].forEach(([x, z]) => {
+        const post = new THREE.Mesh(cornerGeometry, ivory);
+        post.position.set(x, baseY + tier.h / 2, z);
+        post.castShadow = true;
+        group.add(post);
+      });
+    }
+
+    const lightBand = new THREE.Mesh(
+      new THREE.BoxGeometry(tier.w + 0.12, 0.018, tier.d + 0.12),
+      warmLight,
+    );
+    lightBand.position.y = baseY + tier.h * 0.78;
+    group.add(lightBand);
+
+    baseY += tier.h + 0.13;
+  });
+
+  const topTier = tiers[tiers.length - 1];
+  const roofGarden = new THREE.Group();
+  roofGarden.position.y = baseY;
+  const planter = createPlanter(topTier.w * 0.66, topTier.d * 0.66, 0.3);
+  planter.position.set(0, 0, -topTier.d * 0.08);
+  roofGarden.add(planter);
+
+  const roofTree = createTree(0.46);
+  roofTree.position.set(-topTier.w * 0.12, 0.3, topTier.d * 0.08);
+  roofGarden.add(roofTree);
+
+  const crown = new THREE.Mesh(
+    new THREE.BoxGeometry(topTier.w * 0.42, 0.5, topTier.d * 0.42),
+    silver,
+  );
+  crown.position.set(topTier.w * 0.22, 0.25, topTier.d * 0.22);
+  crown.castShadow = true;
+  roofGarden.add(crown);
+
+  group.add(roofGarden);
+
+  return group;
+}
+
+function createTaperedTower(spec) {
+  const group = new THREE.Group();
+  group.position.set(spec.x, 0, spec.z);
+
+  const glass = new THREE.Mesh(
+    new THREE.CylinderGeometry(spec.radius * 0.62, spec.radius, spec.height, 6, 1),
+    (() => {
+      const material = createFacadeMaterial(
+        windowTextures[spec.mood],
+        Math.PI * 2 * spec.radius,
+        spec.height,
+      );
+      material.metalness = 0.66;
+      material.roughness = 0.08;
+      return material;
+    })(),
+  );
+  glass.position.y = CITY_TOP + spec.height / 2;
+  glass.castShadow = true;
+  glass.receiveShadow = true;
+  group.add(glass);
+
+  const plinth = new THREE.Mesh(
+    new THREE.CylinderGeometry(spec.radius + 0.3, spec.radius + 0.42, 0.28, 6),
+    paleStone,
+  );
+  plinth.position.y = CITY_TOP + 0.14;
+  plinth.castShadow = true;
+  group.add(plinth);
+
+  for (let index = 0; index < 6; index += 1) {
+    const angle = (index / 6) * Math.PI * 2 + Math.PI / 6;
+    const fin = new THREE.Mesh(
+      new THREE.BoxGeometry(0.06, spec.height * 0.94, 0.12),
+      bronze,
+    );
+    fin.position.set(
+      Math.cos(angle) * spec.radius * 0.82,
+      CITY_TOP + spec.height * 0.5,
+      Math.sin(angle) * spec.radius * 0.82,
+    );
+    fin.rotation.y = Math.PI / 2 - angle;
+    fin.castShadow = true;
+    group.add(fin);
+  }
+
+  const crown = new THREE.Mesh(
+    new THREE.CylinderGeometry(spec.radius * 0.64, spec.radius * 0.64, 0.16, 8),
+    silver,
+  );
+  crown.position.y = CITY_TOP + spec.height + 0.08;
+  crown.castShadow = true;
+  group.add(crown);
+
+  const garden = createPlanter(spec.radius * 1.2, spec.radius * 1.2, 0.24);
+  garden.position.y = CITY_TOP + spec.height + 0.16;
+  group.add(garden);
+
+  const gardenTree = createTree(0.34);
+  gardenTree.position.set(0, CITY_TOP + spec.height + 0.4, 0);
+  group.add(gardenTree);
+
+  return group;
+}
+
+function createPavilion(spec) {
+  const group = new THREE.Group();
+  group.position.set(spec.x, 0, spec.z);
+
+  const base = new THREE.Mesh(
+    new THREE.BoxGeometry(spec.width + 0.3, 0.2, spec.depth + 0.3),
+    paleStone,
+  );
+  base.position.y = CITY_TOP + 0.1;
+  base.castShadow = true;
+  base.receiveShadow = true;
+  group.add(base);
+
+  const wall = new THREE.Mesh(
+    new THREE.BoxGeometry(spec.width, spec.height, spec.depth),
+    spec.mood === 'bronze' ? bridgeGlass : frostedGlass,
+  );
+  wall.position.y = CITY_TOP + 0.2 + spec.height / 2;
+  group.add(wall);
+
+  const frame = new THREE.Mesh(
+    new THREE.BoxGeometry(spec.width + 0.05, 0.06, spec.depth + 0.05),
+    silver,
+  );
+  frame.position.y = CITY_TOP + 0.88;
+  group.add(frame);
+
+  const roof = new THREE.Mesh(
+    new THREE.BoxGeometry(spec.width + 0.55, 0.12, spec.depth + 0.55),
+    ivory,
+  );
+  roof.position.y = CITY_TOP + spec.height + 0.26;
+  roof.castShadow = true;
+  group.add(roof);
+
+  const lightLine = new THREE.Mesh(
+    new THREE.BoxGeometry(spec.width + 0.3, 0.02, spec.depth + 0.3),
+    warmLight,
+  );
+  lightLine.position.y = CITY_TOP + spec.height + 0.18;
+  group.add(lightLine);
+
+  const roofGarden = new THREE.Group();
+  roofGarden.position.y = CITY_TOP + spec.height + 0.33;
+  const planter = createPlanter(spec.width * 0.72, spec.depth * 0.68, 0.22);
+  roofGarden.add(planter);
+  const tree = createTree(0.42);
+  tree.position.set(-spec.width * 0.16, 0.22, 0.1);
+  roofGarden.add(tree);
+  group.add(roofGarden);
+
+  return group;
+}
+
+function createSkybridge(a, b, height) {
   const dx = b.x - a.x;
   const dz = b.z - a.z;
   const length = Math.hypot(dx, dz);
@@ -267,224 +509,211 @@ function createBridge(a, b, height, accent) {
   group.position.set((a.x + b.x) / 2, CITY_TOP + height, (a.z + b.z) / 2);
   group.rotation.y = Math.atan2(dx, dz);
 
-  const bridge = new THREE.Mesh(
-    new THREE.BoxGeometry(0.44, 0.22, length),
-    structureMaterial,
-  );
-  bridge.castShadow = true;
-  bridge.receiveShadow = true;
-  group.add(bridge);
+  const glass = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.42, length), bridgeGlass);
+  group.add(glass);
 
-  const topStrip = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.025, length), accent);
-  topStrip.position.y = 0.13;
-  group.add(topStrip);
+  const floor = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.06, length), paleStone);
+  floor.position.y = -0.21;
+  floor.castShadow = true;
+  group.add(floor);
 
-  const lowerStrip = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.018, length), accent);
-  lowerStrip.position.y = -0.13;
-  group.add(lowerStrip);
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.05, length), silver);
+  roof.position.y = 0.22;
+  group.add(roof);
+
+  const warmStrip = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.015, length * 0.96), warmLight);
+  warmStrip.position.y = -0.14;
+  group.add(warmStrip);
+
+  const ribCount = Math.max(2, Math.round(length / 0.9));
+  for (let index = 0; index <= ribCount; index += 1) {
+    const rib = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.46, 0.035), ivory);
+    rib.position.z = -length / 2 + (index / ribCount) * length;
+    group.add(rib);
+  }
 
   return group;
 }
 
-function createCentralCore() {
+function createCentralSpire() {
   const group = new THREE.Group();
   group.position.y = CITY_TOP;
 
-  const plinth = new THREE.Mesh(
-    new THREE.CylinderGeometry(2.45, 2.75, 0.28, 12),
-    structureMaterial,
-  );
-  plinth.position.y = 0.14;
-  plinth.castShadow = true;
-  plinth.receiveShadow = true;
-  group.add(plinth);
+  const pool = new THREE.Mesh(new THREE.CircleGeometry(2.5, 80), waterMaterial);
+  pool.rotation.x = -Math.PI / 2;
+  pool.position.y = 0.015;
+  pool.receiveShadow = true;
+  group.add(pool);
 
-  const plinthGlow = new THREE.Mesh(
-    new THREE.TorusGeometry(2.35, 0.035, 6, 80),
-    neonCyan,
-  );
-  plinthGlow.rotation.x = -Math.PI / 2;
-  plinthGlow.position.y = 0.3;
-  group.add(plinthGlow);
+  const poolRim = new THREE.Mesh(new THREE.TorusGeometry(2.5, 0.08, 6, 120), ivory);
+  poolRim.rotation.x = -Math.PI / 2;
+  poolRim.position.y = 0.04;
+  group.add(poolRim);
 
-  const tier = new THREE.Mesh(
-    new THREE.CylinderGeometry(1.85, 2.1, 0.22, 10),
-    structureMaterial,
-  );
-  tier.position.y = 0.39;
-  tier.castShadow = true;
-  tier.receiveShadow = true;
-  group.add(tier);
+  const poolInlay = new THREE.Mesh(new THREE.TorusGeometry(2.31, 0.015, 5, 110), bronze);
+  poolInlay.rotation.x = -Math.PI / 2;
+  poolInlay.position.y = 0.045;
+  group.add(poolInlay);
 
-  const tower = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.62, 1.35, 5.2, 8),
-    structureMaterial,
-  );
-  tower.position.y = 3.1;
-  tower.castShadow = true;
-  tower.receiveShadow = true;
-  group.add(tower);
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.12, 0.28, 12), ivory);
+  base.position.y = 0.14;
+  base.castShadow = true;
+  base.receiveShadow = true;
+  group.add(base);
 
-  [1.3, 2.6, 3.9, 5.1].forEach((fraction, index) => {
-    const ringRadius = 1.35 - (fraction / 5.2) * 0.73;
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(ringRadius + 0.03, 0.025, 6, 64),
-      index % 2 === 0 ? neonCyan : neonMagenta,
-    );
-    ring.rotation.x = Math.PI / 2;
-    ring.position.y = fraction;
-    group.add(ring);
-  });
+  const step = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 0.2, 12), paleStone);
+  step.position.y = 0.38;
+  step.castShadow = true;
+  group.add(step);
+
+  const shaft = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.3, 0.56, 7.9, 8, 1),
+    new THREE.MeshStandardMaterial({
+      color: 0xe9e4d8,
+      roughness: 0.48,
+      metalness: 0.28,
+      envMapIntensity: 0.9,
+    }),
+  );
+  shaft.position.y = 4.25;
+  shaft.castShadow = true;
+  shaft.receiveShadow = true;
+  group.add(shaft);
 
   for (let index = 0; index < 4; index += 1) {
-    const angle = (index / 4) * Math.PI * 2 + Math.PI / 8;
-    const strip = new THREE.Mesh(new THREE.BoxGeometry(0.045, 4.7, 0.045), neonCyan);
-    strip.position.set(Math.cos(angle) * 0.94, 2.9, Math.sin(angle) * 0.94);
-    strip.rotation.y = -angle;
-    group.add(strip);
+    const angle = (index / 4) * Math.PI * 2 + Math.PI / 4;
+    const slot = new THREE.Mesh(
+      new THREE.BoxGeometry(0.04, 6.4, 0.11),
+      bridgeGlass,
+    );
+    slot.position.set(Math.cos(angle) * 0.38, 4.5, Math.sin(angle) * 0.38);
+    slot.rotation.y = -angle;
+    group.add(slot);
   }
 
-  const crown = new THREE.Mesh(
-    new THREE.CylinderGeometry(1.18, 1.0, 0.18, 12),
-    structureMaterial,
+  const warmSlot = new THREE.Mesh(new THREE.BoxGeometry(0.03, 6.2, 0.04), warmLight);
+  warmSlot.position.set(Math.cos(0.3) * 0.39, 4.4, Math.sin(0.3) * 0.39);
+  warmSlot.rotation.y = -0.3;
+  group.add(warmSlot);
+
+  const observation = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.62, 0.62, 0.56, 16),
+    frostedGlass,
   );
-  crown.position.y = 5.78;
-  crown.castShadow = true;
-  group.add(crown);
+  observation.position.y = 7.25;
+  group.add(observation);
 
-  const crownGlow = new THREE.Mesh(
-    new THREE.TorusGeometry(1.08, 0.028, 6, 64),
-    neonMagenta,
+  const observationTop = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.68, 0.68, 0.06, 16),
+    silver,
   );
-  crownGlow.rotation.x = -Math.PI / 2;
-  crownGlow.position.y = 5.89;
-  group.add(crownGlow);
+  observationTop.position.y = 7.55;
+  group.add(observationTop);
 
-  const orbGroup = new THREE.Group();
-  orbGroup.position.y = 7.15;
-  group.add(orbGroup);
-
-  const orbMaterial = new THREE.MeshStandardMaterial({
-    color: 0x9ff9ff,
-    emissive: 0x43dff5,
-    emissiveIntensity: 1.0,
-    metalness: 0.15,
-    roughness: 0.12,
-    transparent: true,
-    opacity: 0.96,
-  });
-  const orb = new THREE.Mesh(new THREE.IcosahedronGeometry(0.82, 2), orbMaterial);
-  orbGroup.add(orb);
-
-  const orbWire = new THREE.Mesh(
-    new THREE.SphereGeometry(1.06, 14, 9),
-    new THREE.MeshBasicMaterial({
-      color: 0x9ffcff,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.24,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      fog: false,
-    }),
+  const observationLight = new THREE.Mesh(
+    new THREE.TorusGeometry(0.62, 0.014, 5, 48),
+    warmLight,
   );
-  orbGroup.add(orbWire);
+  observationLight.rotation.x = -Math.PI / 2;
+  observationLight.position.y = 7.48;
+  group.add(observationLight);
 
-  const orbHalo = new THREE.Sprite(
-    new THREE.SpriteMaterial({
-      map: glowTexture,
-      color: 0x6df2ff,
-      transparent: true,
-      opacity: 0.2,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      fog: false,
-      toneMapped: false,
-    }),
-  );
-  orbHalo.scale.set(4.2, 4.2, 1);
-  orbGroup.add(orbHalo);
+  const halo = new THREE.Mesh(new THREE.TorusGeometry(1.15, 0.03, 6, 80), silver);
+  halo.position.y = 8.72;
+  halo.rotation.set(Math.PI / 2 + 0.12, 0.2, 0);
+  group.add(halo);
 
-  const ringA = new THREE.Mesh(new THREE.TorusGeometry(1.52, 0.026, 6, 96), neonCyan);
-  ringA.rotation.set(Math.PI / 2.6, 0.25, 0);
-  orbGroup.add(ringA);
+  const cap = new THREE.Mesh(new THREE.ConeGeometry(0.26, 0.65, 8), silver);
+  cap.position.y = 8.4;
+  cap.castShadow = true;
+  group.add(cap);
 
-  const ringB = new THREE.Mesh(new THREE.TorusGeometry(1.9, 0.018, 6, 96), neonMagenta);
-  ringB.rotation.set(Math.PI / 2.1, -0.5, 0.35);
-  orbGroup.add(ringB);
+  const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 8), warmLight);
+  beacon.position.y = 9.02;
+  group.add(beacon);
 
-  const holoRingA = new THREE.Mesh(
-    new THREE.TorusGeometry(2.5, 0.012, 4, 100),
-    new THREE.MeshBasicMaterial({
-      color: 0x88f4ff,
-      transparent: true,
-      opacity: 0.1,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      fog: false,
-    }),
-  );
-  holoRingA.rotation.set(Math.PI / 2 + 0.35, 0, 0.2);
-  holoRingA.position.y = 7.4;
-  group.add(holoRingA);
-
-  const coreLight = new THREE.PointLight(0x5feaff, 26, 16, 2);
-  coreLight.position.y = 7.2;
-  group.add(coreLight);
+  const spireLight = new THREE.PointLight(0xffd8a2, 6, 6, 2);
+  spireLight.position.y = 8.9;
+  group.add(spireLight);
 
   return {
     group,
-    update(time, delta) {
-      orb.rotation.y += delta * 0.22;
-      orb.rotation.x = Math.sin(time * 0.25) * 0.12;
-      orbWire.rotation.y -= delta * 0.12;
-      orbWire.rotation.z += delta * 0.05;
-      ringA.rotation.z += delta * 0.16;
-      ringA.rotation.x += delta * 0.06;
-      ringB.rotation.y -= delta * 0.12;
-      ringB.rotation.z -= delta * 0.08;
-      holoRingA.rotation.z += delta * 0.03;
-
-      const pulse = 0.85 + Math.sin(time * 1.5) * 0.12;
-      orb.scale.setScalar(pulse);
-      orbMaterial.emissiveIntensity = 0.92 + Math.sin(time * 1.5) * 0.18;
-      coreLight.intensity = 20 + Math.sin(time * 1.5) * 4;
-      orbHalo.material.opacity = 0.16 + Math.sin(time * 1.5) * 0.04;
+    update(time) {
+      halo.rotation.z = time * 0.04;
+      observationLight.material.emissiveIntensity = 0.75 + Math.sin(time * 0.8) * 0.08;
     },
   };
 }
 
-function createLandingPad(x, z, accent) {
+function createPlazaDetails() {
   const group = new THREE.Group();
-  group.position.set(x, CITY_TOP + 0.02, z);
 
-  const pad = new THREE.Mesh(
-    new THREE.CircleGeometry(1.05, 48),
-    new THREE.MeshStandardMaterial({
-      color: 0x0b1420,
-      metalness: 0.8,
-      roughness: 0.38,
-    }),
-  );
-  pad.rotation.x = -Math.PI / 2;
-  group.add(pad);
+  const benches = [
+    { angle: 0.5, radius: 3.2 },
+    { angle: 1.65, radius: 3.4 },
+    { angle: 3.4, radius: 3.2 },
+    { angle: 4.9, radius: 3.4 },
+  ];
 
-  const ringMaterial = accent === 'magenta' ? neonMagenta : neonCyan;
-  const rim = new THREE.Mesh(new THREE.RingGeometry(0.98, 1.08, 48), ringMaterial);
-  rim.rotation.x = -Math.PI / 2;
-  rim.position.y = 0.012;
-  group.add(rim);
+  benches.forEach((bench) => {
+    const b = new THREE.Group();
+    b.position.set(
+      Math.cos(bench.angle) * bench.radius,
+      CITY_TOP,
+      Math.sin(bench.angle) * bench.radius,
+    );
+    b.rotation.y = -bench.angle + Math.PI / 2;
 
-  const inner = new THREE.Mesh(new THREE.RingGeometry(0.42, 0.46, 32), ringMaterial);
-  inner.rotation.x = -Math.PI / 2;
-  inner.position.y = 0.014;
-  group.add(inner);
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(1.15, 0.1, 0.38), paleStone);
+    seat.position.y = 0.35;
+    seat.castShadow = true;
+    b.add(seat);
 
-  for (let index = 0; index < 4; index += 1) {
-    const angle = (index / 4) * Math.PI * 2 + Math.PI / 4;
-    const light = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.03, 0.08), ringMaterial);
-    light.position.set(Math.cos(angle) * 1.05, 0.02, Math.sin(angle) * 1.05);
-    group.add(light);
+    [-0.42, 0.42].forEach((x) => {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.32, 0.3), silver);
+      leg.position.set(x, 0.16, 0);
+      b.add(leg);
+    });
+
+    group.add(b);
+  });
+
+  const treeSpots = [
+    { x: -4.9, z: -3.8, scale: 0.9 },
+    { x: 4.9, z: -3.9, scale: 0.75 },
+    { x: -4.7, z: 3.6, scale: 0.82 },
+  ];
+
+  treeSpots.forEach((spot) => {
+    const planter = createPlanter(1.1, 1.1, 0.36);
+    planter.position.set(spot.x, CITY_TOP, spot.z);
+    group.add(planter);
+    const tree = createTree(spot.scale);
+    tree.position.set(spot.x, CITY_TOP + 0.36, spot.z);
+    group.add(tree);
+  });
+
+  const bollardGeometry = new THREE.CylinderGeometry(0.025, 0.035, 0.72, 6);
+  const bollardTipGeometry = new THREE.SphereGeometry(0.045, 8, 6);
+  for (let index = 0; index < 12; index += 1) {
+    const angle = (index / 12) * Math.PI * 2 + 0.22;
+    const radius = 5.15;
+    const bollard = new THREE.Group();
+    bollard.position.set(
+      Math.cos(angle) * radius,
+      CITY_TOP,
+      Math.sin(angle) * radius,
+    );
+
+    const post = new THREE.Mesh(bollardGeometry, silver);
+    post.position.y = 0.36;
+    bollard.add(post);
+
+    const tip = new THREE.Mesh(bollardTipGeometry, warmLight);
+    tip.position.y = 0.75;
+    bollard.add(tip);
+
+    group.add(bollard);
   }
 
   return group;
@@ -492,91 +721,99 @@ function createLandingPad(x, z, accent) {
 
 export function createCity() {
   const group = new THREE.Group();
-  const beacons = [];
 
-  const buildingSpecs = [
-    { x: 3.15, z: 0.55, w: 1.9, d: 1.75, h: 4.5, palette: 0, accent: 'cyan', style: 'stepped' },
-    { x: -3.05, z: 2.05, w: 2.1, d: 1.65, h: 6.0, palette: 1, accent: 'magenta', band: true },
-    { x: -1.35, z: -3.3, w: 2.0, d: 1.9, h: 5.5, palette: 0, accent: 'cyan', style: 'cylinder' },
-    { x: 2.1, z: -3.0, w: 1.55, d: 2.0, h: 3.4, palette: 2, accent: 'amber' },
-    { x: -4.0, z: -1.1, w: 1.55, d: 1.5, h: 3.0, palette: 0, accent: 'cyan' },
-    { x: 3.9, z: -2.3, w: 1.35, d: 1.35, h: 2.5, palette: 1, accent: 'magenta' },
-    { x: -2.55, z: 3.7, w: 1.45, d: 1.45, h: 4.6, palette: 2, accent: 'amber' },
-    { x: 0.95, z: 4.05, w: 1.65, d: 1.25, h: 3.2, palette: 0, accent: 'cyan' },
-    { x: -3.0, z: -3.1, w: 1.3, d: 1.3, h: 3.2, palette: 1, accent: 'magenta' },
-    { x: 4.35, z: 1.25, w: 1.25, d: 1.25, h: 2.0, palette: 2, accent: 'amber', antennaHeight: 1.4 },
+  const finnedTowers = [
+    { x: -3.0, z: 2.0, radius: 1.02, height: 7.15, mood: 'cool', spire: true },
+    { x: -1.0, z: 3.85, radius: 0.72, height: 4.65, mood: 'warm' },
   ];
-
-  buildingSpecs.forEach((spec) => {
-    if (spec.style === 'cylinder') {
-      const towerGroup = new THREE.Group();
-      towerGroup.position.set(spec.x, 0, spec.z);
-      group.add(towerGroup);
-      createCylinderTower(spec, towerGroup);
-      createRoofDetails(spec, towerGroup, CITY_TOP + spec.h, accentMaterials[spec.accent], beacons);
-    } else {
-      addBoxTower(spec, group, beacons);
-    }
-  });
+  finnedTowers.forEach((spec) => group.add(createFinnedTower(spec)));
 
   group.add(
-    createBridge(
-      { x: 3.15, z: 0.55 },
-      { x: 4.35, z: 1.25 },
-      2.55,
-      neonCyan,
-    ),
+    createSetbackTower({
+      x: -1.15,
+      z: -3.1,
+      width: 2.15,
+      depth: 1.8,
+      height: 6.4,
+      mood: 'warm',
+    }),
   );
+
   group.add(
-    createBridge(
-      { x: -3.05, z: 2.05 },
-      { x: -2.55, z: 3.7 },
-      2.15,
-      neonMagenta,
-    ),
+    createTaperedTower({
+      x: 2.55,
+      z: -2.15,
+      radius: 0.96,
+      height: 5.4,
+      mood: 'bronze',
+    }),
   );
+
   group.add(
-    createBridge(
-      { x: -1.35, z: -3.3 },
-      { x: -3.0, z: -3.1 },
-      2.7,
-      neonCyan,
-    ),
+    createSetbackTower({
+      x: 3.8,
+      z: 0.65,
+      width: 1.3,
+      depth: 1.25,
+      height: 4.5,
+      mood: 'cool',
+    }),
   );
 
-  const core = createCentralCore();
-  group.add(core.group);
+  group.add(
+    createPavilion({
+      x: -4.1,
+      z: -1.15,
+      width: 2.0,
+      depth: 1.45,
+      height: 2.7,
+      mood: 'bronze',
+    }),
+  );
 
-  group.add(createLandingPad(3.2, -4.9, 'cyan'));
-  group.add(createLandingPad(-4.6, -2.6, 'magenta'));
+  group.add(
+    createPavilion({
+      x: 1.2,
+      z: -4.5,
+      width: 1.85,
+      depth: 1.45,
+      height: 2.1,
+      mood: 'cool',
+    }),
+  );
 
-  const lampGeometry = new THREE.CylinderGeometry(0.025, 0.04, 0.86, 6);
-  const lampTipGeometry = new THREE.SphereGeometry(0.07, 8, 6);
+  group.add(
+    createPavilion({
+      x: 4.75,
+      z: -1.3,
+      width: 1.45,
+      depth: 1.15,
+      height: 1.9,
+      mood: 'bronze',
+    }),
+  );
 
-  for (let index = 0; index < 14; index += 1) {
-    const angle = (index / 14) * Math.PI * 2 + 0.17;
-    const radius = 5.35;
-    const lamp = new THREE.Group();
-    lamp.position.set(Math.cos(angle) * radius, CITY_TOP, Math.sin(angle) * radius);
+  group.add(
+    createSetbackTower({
+      x: 0.9,
+      z: 4.05,
+      width: 1.05,
+      depth: 1.05,
+      height: 3.6,
+      mood: 'bronze',
+    }),
+  );
 
-    const pole = new THREE.Mesh(lampGeometry, structureMaterial);
-    pole.position.y = 0.43;
-    lamp.add(pole);
+  const spire = createCentralSpire();
+  group.add(spire.group);
 
-    const tip = new THREE.Mesh(lampTipGeometry, index % 4 === 0 ? neonMagenta : neonCyan);
-    tip.position.y = 0.88;
-    lamp.add(tip);
+  group.add(createPlazaDetails());
 
-    group.add(lamp);
-  }
+  group.add(createSkybridge({ x: -3.0, z: 2.0 }, { x: -1.0, z: 3.85 }, 3.3));
+  group.add(createSkybridge({ x: 2.55, z: -2.15 }, { x: 3.8, z: 0.65 }, 3.15));
 
-  function update(time, delta) {
-    core.update(time, delta);
-
-    beaconMaterial.emissiveIntensity = 1.4 + Math.sin(time * 2.5) * 0.6;
-    beacons.forEach((beacon, index) => {
-      beacon.material.opacity = 0.28 + Math.sin(time * 2.5 + index * 0.7) * 0.12;
-    });
+  function update(time) {
+    spire.update(time);
   }
 
   return { group, update };

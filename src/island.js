@@ -1,147 +1,155 @@
 import * as THREE from 'three';
 import { glowTexture, mulberry32 } from './utils.js';
 
-export const CITY_TOP = 0.82;
+export const CITY_TOP = 0.84;
 export const DECK_RADIUS = 7.12;
 
-function createDeckTextures() {
+const rockMaterial = new THREE.MeshStandardMaterial({
+  vertexColors: true,
+  flatShading: true,
+  roughness: 0.96,
+  metalness: 0.04,
+});
+
+const ivoryStoneMaterial = new THREE.MeshStandardMaterial({
+  color: 0xded8cc,
+  roughness: 0.72,
+  metalness: 0.04,
+});
+
+const lightStoneMaterial = new THREE.MeshStandardMaterial({
+  color: 0xcfc8bb,
+  roughness: 0.8,
+  metalness: 0.03,
+});
+
+const silverMaterial = new THREE.MeshStandardMaterial({
+  color: 0xb9c0c1,
+  roughness: 0.27,
+  metalness: 0.82,
+});
+
+const bronzeMaterial = new THREE.MeshStandardMaterial({
+  color: 0xa18158,
+  roughness: 0.34,
+  metalness: 0.78,
+});
+
+const darkMetalMaterial = new THREE.MeshStandardMaterial({
+  color: 0x30383b,
+  roughness: 0.38,
+  metalness: 0.72,
+});
+
+const warmLightMaterial = new THREE.MeshStandardMaterial({
+  color: 0x3a3022,
+  emissive: 0xffd9a1,
+  emissiveIntensity: 0.75,
+  roughness: 0.3,
+  metalness: 0.2,
+});
+
+const glassMaterial = new THREE.MeshStandardMaterial({
+  color: 0x9db5bd,
+  transparent: true,
+  opacity: 0.3,
+  roughness: 0.08,
+  metalness: 0.2,
+  envMapIntensity: 1.8,
+  side: THREE.DoubleSide,
+  depthWrite: false,
+});
+
+function createDeckTexture() {
   const size = 1024;
-  const baseCanvas = document.createElement('canvas');
-  baseCanvas.width = size;
-  baseCanvas.height = size;
-  const base = baseCanvas.getContext('2d');
-
-  const glowCanvas = document.createElement('canvas');
-  glowCanvas.width = size;
-  glowCanvas.height = size;
-  const glow = glowCanvas.getContext('2d');
-
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const context = canvas.getContext('2d');
+  const random = mulberry32(491);
   const center = size / 2;
-  const maxRadius = size * 0.496;
+  const maxRadius = size * 0.497;
 
-  const background = base.createRadialGradient(center, center, 0, center, center, size * 0.7);
-  background.addColorStop(0, '#101b2c');
-  background.addColorStop(0.55, '#0a1322');
-  background.addColorStop(1, '#050a12');
-  base.fillStyle = background;
-  base.fillRect(0, 0, size, size);
+  const background = context.createRadialGradient(center, center, 40, center, center, size * 0.7);
+  background.addColorStop(0, '#e3ded3');
+  background.addColorStop(0.55, '#d7d1c6');
+  background.addColorStop(1, '#bbb4a7');
+  context.fillStyle = background;
+  context.fillRect(0, 0, size, size);
 
-  glow.fillStyle = '#000000';
-  glow.fillRect(0, 0, size, size);
+  context.globalAlpha = 0.08;
+  for (let index = 0; index < 5000; index += 1) {
+    context.fillStyle = random() > 0.5 ? '#ffffff' : '#706a60';
+    const x = random() * size;
+    const y = random() * size;
+    context.fillRect(x, y, 1 + random() * 2, 1 + random() * 2);
+  }
+  context.globalAlpha = 1;
 
-  base.save();
-  base.translate(center, center);
+  context.save();
+  context.translate(center, center);
 
-  base.strokeStyle = 'rgba(58, 103, 136, 0.22)';
-  base.lineWidth = 1;
-  for (let radius = 32; radius < maxRadius; radius += 32) {
-    base.beginPath();
-    base.arc(0, 0, radius, 0, Math.PI * 2);
-    base.stroke();
+  context.strokeStyle = 'rgba(122, 117, 106, 0.26)';
+  context.lineWidth = 1.5;
+  for (let radius = 58; radius < maxRadius; radius += 58) {
+    context.beginPath();
+    context.arc(0, 0, radius, 0, Math.PI * 2);
+    context.stroke();
   }
 
-  base.strokeStyle = 'rgba(74, 135, 172, 0.2)';
+  context.strokeStyle = 'rgba(122, 117, 106, 0.18)';
   for (let index = 0; index < 24; index += 1) {
     const angle = (index / 24) * Math.PI * 2;
-    base.beginPath();
-    base.moveTo(Math.cos(angle) * 46, Math.sin(angle) * 46);
-    base.lineTo(Math.cos(angle) * maxRadius, Math.sin(angle) * maxRadius);
-    base.stroke();
+    context.beginPath();
+    context.moveTo(Math.cos(angle) * 52, Math.sin(angle) * 52);
+    context.lineTo(Math.cos(angle) * maxRadius, Math.sin(angle) * maxRadius);
+    context.stroke();
   }
 
-  base.strokeStyle = 'rgba(123, 224, 255, 0.28)';
-  base.lineWidth = 2;
-  for (let index = 0; index < 8; index += 1) {
-    const angle = (index / 8) * Math.PI * 2 + 0.2;
-    base.beginPath();
-    base.moveTo(Math.cos(angle) * 90, Math.sin(angle) * 90);
-    base.lineTo(Math.cos(angle) * maxRadius, Math.sin(angle) * maxRadius);
-    base.stroke();
+  context.strokeStyle = 'rgba(82, 82, 78, 0.24)';
+  context.lineWidth = 3;
+  context.beginPath();
+  context.arc(0, 0, 224, 0, Math.PI * 2);
+  context.stroke();
+
+  context.strokeStyle = 'rgba(255, 251, 242, 0.38)';
+  context.lineWidth = 2;
+  context.beginPath();
+  context.arc(0, 0, 232, 0, Math.PI * 2);
+  context.stroke();
+
+  context.strokeStyle = 'rgba(102, 96, 84, 0.16)';
+  context.lineWidth = 1;
+  for (let index = 0; index < 14; index += 1) {
+    const angle = (index / 14) * Math.PI * 2 + 0.11;
+    const inner = 104 + random() * 32;
+    const outer = 300 + random() * 150;
+    context.beginPath();
+    context.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner);
+    context.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer);
+    context.stroke();
   }
 
-  base.fillStyle = 'rgba(5, 12, 22, 0.72)';
-  base.strokeStyle = 'rgba(87, 166, 200, 0.24)';
-  base.lineWidth = 1.5;
-  const random = mulberry32(433);
-  for (let index = 0; index < 160; index += 1) {
-    const angle = random() * Math.PI * 2;
-    const radius = 120 + random() * (maxRadius - 150);
-    const w = 10 + random() * 45;
-    const h = 8 + random() * 26;
-    const x = Math.cos(angle) * radius;
-    const y = Math.sin(angle) * radius;
-    base.save();
-    base.translate(x, y);
-    base.rotate(angle + Math.PI / 2);
-    base.fillRect(-w / 2, -h / 2, w, h);
-    base.strokeRect(-w / 2, -h / 2, w, h);
-    base.restore();
-  }
+  context.restore();
 
-  base.restore();
-
-  glow.save();
-  glow.translate(center, center);
-  glow.strokeStyle = 'rgba(78, 240, 255, 0.85)';
-  glow.lineWidth = 3;
-  [maxRadius * 0.27, maxRadius * 0.55, maxRadius * 0.83].forEach((radius, index) => {
-    glow.beginPath();
-    glow.arc(0, 0, radius, index * 0.8, Math.PI * 1.55 + index * 0.6);
-    glow.stroke();
-  });
-
-  glow.strokeStyle = 'rgba(255, 86, 209, 0.8)';
-  glow.lineWidth = 2;
-  glow.beginPath();
-  glow.arc(0, 0, maxRadius * 0.68, Math.PI * 1.22, Math.PI * 1.72);
-  glow.stroke();
-
-  glow.strokeStyle = 'rgba(109, 245, 255, 0.6)';
-  glow.lineWidth = 1.5;
-  for (let index = 0; index < 24; index += 1) {
-    if (index % 3 === 0) continue;
-    const angle = (index / 24) * Math.PI * 2;
-    glow.beginPath();
-    glow.moveTo(Math.cos(angle) * 66, Math.sin(angle) * 66);
-    glow.lineTo(Math.cos(angle) * maxRadius, Math.sin(angle) * maxRadius);
-    glow.stroke();
-  }
-
-  const dotRandom = mulberry32(912);
-  glow.fillStyle = 'rgba(124, 247, 255, 0.7)';
-  for (let index = 0; index < 260; index += 1) {
-    const angle = dotRandom() * Math.PI * 2;
-    const radius = 80 + dotRandom() * (maxRadius - 90);
-    glow.beginPath();
-    glow.arc(Math.cos(angle) * radius, Math.sin(angle) * radius, 1 + dotRandom() * 2.1, 0, Math.PI * 2);
-    glow.fill();
-  }
-
-  glow.restore();
-
-  const baseTexture = new THREE.CanvasTexture(baseCanvas);
-  baseTexture.colorSpace = THREE.SRGBColorSpace;
-  baseTexture.anisotropy = 8;
-
-  const glowTexture = new THREE.CanvasTexture(glowCanvas);
-  glowTexture.colorSpace = THREE.SRGBColorSpace;
-  glowTexture.anisotropy = 8;
-
-  return { baseTexture, glowTexture };
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 8;
+  return texture;
 }
 
 export function createRockGeometry(seed = 7.3, segments = 48, rings = 20) {
   const radius = 7.7;
-  const depth = 12.4;
+  const depth = 7.2;
   const topY = 0.05;
   const positions = [];
   const colors = [];
   const indices = [];
   const ringStarts = [];
 
-  const topColor = new THREE.Color('#434b58');
-  const deepColor = new THREE.Color('#232b37');
-  const coldColor = new THREE.Color('#2c4052');
+  const topColor = new THREE.Color('#6f6a61');
+  const deepColor = new THREE.Color('#2a2e30');
+  const coldColor = new THREE.Color('#45545a');
 
   positions.push(0, topY, 0);
   colors.push(topColor.r, topColor.g, topColor.b);
@@ -170,11 +178,11 @@ export function createRockGeometry(seed = 7.3, segments = 48, rings = 20) {
       positions.push(Math.cos(angle) * ringRadius, y, Math.sin(angle) * ringRadius);
 
       const color = topColor.clone().lerp(deepColor, Math.pow(t, 0.75));
-      const strata = Math.sin(t * 24 + Math.sin(angle * 3 + seed) * 2) * 0.035;
-      color.offsetHSL(0.015 * Math.sin(angle * 2 + t * 3), 0.06, strata);
+      const strata = Math.sin(t * 21 + Math.sin(angle * 3 + seed) * 2) * 0.028;
+      color.offsetHSL(0.01 * Math.sin(angle * 2 + t * 3), 0.02, strata);
 
-      if (t > 0.16 && t < 0.7 && Math.sin(angle * 4.2 + seed * 2.3) > 0.45) {
-        color.lerp(coldColor, (1 - Math.abs(t - 0.42) / 0.3) * 0.35);
+      if (t > 0.2 && t < 0.68 && Math.sin(angle * 4.2 + seed * 2.3) > 0.52) {
+        color.lerp(coldColor, (1 - Math.abs(t - 0.44) / 0.28) * 0.26);
       }
 
       colors.push(color.r, color.g, color.b);
@@ -203,7 +211,7 @@ export function createRockGeometry(seed = 7.3, segments = 48, rings = 20) {
 
   const tipIndex = positions.length / 3;
   positions.push(0.22, topY - depth - 0.65, -0.15);
-  const tipColor = deepColor.clone().offsetHSL(0.01, 0.1, -0.02);
+  const tipColor = deepColor.clone().offsetHSL(0.01, 0.06, -0.02);
   colors.push(tipColor.r, tipColor.g, tipColor.b);
 
   const bottomRing = ringStarts[rings];
@@ -221,41 +229,6 @@ export function createRockGeometry(seed = 7.3, segments = 48, rings = 20) {
   return geometry;
 }
 
-const rockMaterial = new THREE.MeshStandardMaterial({
-  vertexColors: true,
-  flatShading: true,
-  roughness: 0.93,
-  metalness: 0.08,
-});
-
-const darkMetalMaterial = new THREE.MeshStandardMaterial({
-  color: 0x161f2d,
-  metalness: 0.86,
-  roughness: 0.28,
-});
-
-const darkerMetalMaterial = new THREE.MeshStandardMaterial({
-  color: 0x0b111b,
-  metalness: 0.8,
-  roughness: 0.38,
-});
-
-const cyanNeonMaterial = new THREE.MeshStandardMaterial({
-  color: 0x07151b,
-  emissive: 0x5ff4ff,
-  emissiveIntensity: 2.0,
-  roughness: 0.2,
-  metalness: 0.25,
-});
-
-const magentaNeonMaterial = new THREE.MeshStandardMaterial({
-  color: 0x1b0817,
-  emissive: 0xff5fd6,
-  emissiveIntensity: 1.9,
-  roughness: 0.2,
-  metalness: 0.2,
-});
-
 export function createIslandBase() {
   const group = new THREE.Group();
 
@@ -264,16 +237,13 @@ export function createIslandBase() {
   rock.receiveShadow = true;
   group.add(rock);
 
-  const { baseTexture, glowTexture: deckGlowTexture } = createDeckTextures();
-
+  const deckTexture = createDeckTexture();
   const deckMaterial = new THREE.MeshStandardMaterial({
-    map: baseTexture,
-    emissiveMap: deckGlowTexture,
-    emissive: 0xffffff,
-    emissiveIntensity: 0.75,
-    color: 0xaebfcc,
-    metalness: 0.68,
-    roughness: 0.42,
+    map: deckTexture,
+    color: 0xffffff,
+    roughness: 0.78,
+    metalness: 0.04,
+    envMapIntensity: 0.5,
   });
 
   const deck = new THREE.Mesh(new THREE.CircleGeometry(DECK_RADIUS, 128), deckMaterial);
@@ -282,70 +252,75 @@ export function createIslandBase() {
   deck.receiveShadow = true;
   group.add(deck);
 
-  const skirt = new THREE.Mesh(
-    new THREE.CylinderGeometry(7.4, 7.72, 0.95, 96, 1, true),
+  const fascia = new THREE.Mesh(
+    new THREE.CylinderGeometry(7.34, 7.58, 1.0, 96, 1, true),
+    ivoryStoneMaterial,
+  );
+  fascia.position.y = 0.36;
+  fascia.castShadow = true;
+  fascia.receiveShadow = true;
+  group.add(fascia);
+
+  const lowerFascia = new THREE.Mesh(
+    new THREE.CylinderGeometry(7.56, 7.62, 0.24, 96, 1, true),
     darkMetalMaterial,
   );
-  skirt.position.y = 0.38;
-  skirt.castShadow = true;
-  skirt.receiveShadow = true;
-  group.add(skirt);
+  lowerFascia.position.y = -0.2;
+  group.add(lowerFascia);
 
-  const skirtSlatGeometry = new THREE.BoxGeometry(0.04, 0.4, 0.045);
-  const slatCount = 48;
-  const slats = new THREE.InstancedMesh(skirtSlatGeometry, cyanNeonMaterial, slatCount);
-  const slatDummy = new THREE.Object3D();
-
-  for (let index = 0; index < slatCount; index += 1) {
-    const angle = (index / slatCount) * Math.PI * 2;
-    slatDummy.position.set(Math.cos(angle) * 7.55, 0.56, Math.sin(angle) * 7.55);
-    slatDummy.rotation.set(0, -angle + Math.PI / 2, 0);
-    slatDummy.updateMatrix();
-    slats.setMatrixAt(index, slatDummy.matrix);
-  }
-  slats.instanceMatrix.needsUpdate = true;
-  group.add(slats);
-
-  const rim = new THREE.Mesh(new THREE.TorusGeometry(7.2, 0.16, 10, 160), darkMetalMaterial);
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(7.21, 0.095, 8, 160), silverMaterial);
   rim.rotation.x = -Math.PI / 2;
-  rim.position.y = CITY_TOP - 0.02;
+  rim.position.y = CITY_TOP;
   rim.castShadow = true;
   rim.receiveShadow = true;
   group.add(rim);
 
-  const rimGlow = new THREE.Mesh(new THREE.TorusGeometry(7.09, 0.024, 6, 180), cyanNeonMaterial);
-  rimGlow.rotation.x = -Math.PI / 2;
-  rimGlow.position.y = CITY_TOP + 0.05;
-  group.add(rimGlow);
-
-  const outerGlow = new THREE.Mesh(
-    new THREE.TorusGeometry(7.31, 0.018, 6, 180),
-    magentaNeonMaterial,
+  const bronzePinline = new THREE.Mesh(
+    new THREE.TorusGeometry(7.33, 0.022, 6, 160),
+    bronzeMaterial,
   );
-  outerGlow.rotation.x = -Math.PI / 2;
-  outerGlow.position.y = 0.2;
-  group.add(outerGlow);
+  bronzePinline.rotation.x = -Math.PI / 2;
+  bronzePinline.position.y = 0.78;
+  group.add(bronzePinline);
 
-  const deckRings = [];
-  [
-    { radius: 2.75, color: cyanNeonMaterial, intensity: 1 },
-    { radius: 4.8, color: magentaNeonMaterial, intensity: 0.7 },
-  ].forEach((spec) => {
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(spec.radius, 0.015, 6, 160), spec.color);
-    ring.rotation.x = -Math.PI / 2;
-    ring.position.y = CITY_TOP + 0.012;
-    group.add(ring);
-    deckRings.push({ mesh: ring, intensity: spec.intensity });
-  });
+  const rimLights = new THREE.InstancedMesh(
+    new THREE.SphereGeometry(0.045, 8, 6),
+    warmLightMaterial,
+    32,
+  );
+  const lightDummy = new THREE.Object3D();
+  for (let index = 0; index < 32; index += 1) {
+    const angle = (index / 32) * Math.PI * 2;
+    lightDummy.position.set(Math.cos(angle) * 7.33, 0.24, Math.sin(angle) * 7.33);
+    lightDummy.updateMatrix();
+    rimLights.setMatrixAt(index, lightDummy.matrix);
+  }
+  rimLights.instanceMatrix.needsUpdate = true;
+  group.add(rimLights);
+
+  const fasciaRibs = new THREE.InstancedMesh(
+    new THREE.BoxGeometry(0.05, 0.72, 0.16),
+    silverMaterial,
+    36,
+  );
+  const ribDummy = new THREE.Object3D();
+  for (let index = 0; index < 36; index += 1) {
+    const angle = (index / 36) * Math.PI * 2;
+    ribDummy.position.set(Math.cos(angle) * 7.43, -0.06, Math.sin(angle) * 7.43);
+    ribDummy.rotation.set(0, Math.PI / 2 - angle, 0);
+    ribDummy.updateMatrix();
+    fasciaRibs.setMatrixAt(index, ribDummy.matrix);
+  }
+  fasciaRibs.instanceMatrix.needsUpdate = true;
+  group.add(fasciaRibs);
 
   const underside = new THREE.Group();
   group.add(underside);
 
   const underRings = [];
   const ringSpecs = [
-    { y: -3.1, radius: 6.82, color: cyanNeonMaterial, nodes: 6 },
-    { y: -5.9, radius: 5.42, color: magentaNeonMaterial, nodes: 5 },
-    { y: -8.9, radius: 3.82, color: cyanNeonMaterial, nodes: 4 },
+    { y: -2.4, radius: 6.05, material: silverMaterial, nodes: 6 },
+    { y: -4.8, radius: 4.0, material: bronzeMaterial, nodes: 4 },
   ];
 
   ringSpecs.forEach((spec, index) => {
@@ -353,142 +328,101 @@ export function createIslandBase() {
     unit.position.y = spec.y;
 
     const frame = new THREE.Mesh(
-      new THREE.TorusGeometry(spec.radius, 0.07, 8, 140),
-      darkerMetalMaterial,
+      new THREE.TorusGeometry(spec.radius, 0.07, 8, 120),
+      spec.material,
     );
     frame.rotation.x = -Math.PI / 2;
     unit.add(frame);
 
-    const energy = new THREE.Mesh(
-      new THREE.TorusGeometry(spec.radius + 0.01, 0.026, 6, 160),
-      spec.color,
+    const inset = new THREE.Mesh(
+      new THREE.TorusGeometry(spec.radius + 0.01, 0.018, 6, 140),
+      warmLightMaterial,
     );
-    energy.rotation.x = -Math.PI / 2;
-    energy.position.y = 0.04;
-    unit.add(energy);
+    inset.rotation.x = -Math.PI / 2;
+    inset.position.y = 0.03;
+    unit.add(inset);
 
-    const nodeGeometry = new THREE.BoxGeometry(0.16, 0.12, 0.5);
+    const nodeGeometry = new THREE.BoxGeometry(0.12, 0.08, 0.34);
     for (let nodeIndex = 0; nodeIndex < spec.nodes; nodeIndex += 1) {
       const angle = (nodeIndex / spec.nodes) * Math.PI * 2;
-      const node = new THREE.Mesh(nodeGeometry, spec.color);
-      node.position.set(Math.cos(angle) * spec.radius, 0.03, Math.sin(angle) * spec.radius);
+      const node = new THREE.Mesh(nodeGeometry, spec.material);
+      node.position.set(
+        Math.cos(angle) * (spec.radius + 0.08),
+        0.02,
+        Math.sin(angle) * (spec.radius + 0.08),
+      );
       node.rotation.y = -angle;
       unit.add(node);
     }
 
-    unit.userData.phase = index * 1.7;
     underside.add(unit);
-    underRings.push({ group: unit, color: spec.color, phase: index * 1.7 });
+    underRings.push({ group: unit, phase: index * 1.8 });
   });
 
-  const beamMaterial = new THREE.MeshBasicMaterial({
-    color: 0x5feaff,
-    transparent: true,
-    opacity: 0.04,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-    side: THREE.DoubleSide,
-    fog: false,
-    toneMapped: false,
-  });
-
-  const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 1.55, 14, 24, 1, true), beamMaterial);
-  beam.position.y = -20;
-  underside.add(beam);
-
-  const beamCoreMaterial = beamMaterial.clone();
-  beamCoreMaterial.opacity = 0.085;
-  const beamCore = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.04, 0.36, 14, 16, 1, true),
-    beamCoreMaterial,
-  );
-  beamCore.position.y = -20;
-  underside.add(beamCore);
-
-  const underGlow = new THREE.Sprite(
-    new THREE.SpriteMaterial({
-      map: glowTexture,
-      color: 0x57e6ff,
-      transparent: true,
-      opacity: 0.3,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      fog: false,
-      toneMapped: false,
-    }),
-  );
-  underGlow.position.y = -12.5;
-  underGlow.scale.set(10, 5, 1);
-  underside.add(underGlow);
-
-  const underLight = new THREE.PointLight(0x4adfff, 26, 34, 2);
-  underLight.position.y = -12.5;
-  group.add(underLight);
-
-  const conduitAngles = [0.35, 1.15, 2.05, 3.35, 4.45, 5.55];
-  const conduitMaterials = [cyanNeonMaterial, magentaNeonMaterial];
-
-  conduitAngles.forEach((angle, index) => {
-    const material = conduitMaterials[index % 2];
+  const structureAngles = [0.25, 1.05, 1.85, 2.65, 3.45, 4.25, 5.05, 5.85];
+  structureAngles.forEach((angle, index) => {
     const cos = Math.cos(angle);
     const sin = Math.sin(angle);
-    const top = new THREE.Vector3(cos * 7.5, -1.05, sin * 7.5);
-    const middle = new THREE.Vector3(cos * 6.35, -3.65, sin * 6.35);
-    const bottom = new THREE.Vector3(cos * 5.15, -6.1, sin * 5.15);
-    const curve = new THREE.CatmullRomCurve3([top, middle, bottom]);
-    const conduit = new THREE.Mesh(
-      new THREE.TubeGeometry(curve, 16, 0.028, 5, false),
-      material,
+    const points = [
+      new THREE.Vector3(cos * 7.4, -0.25, sin * 7.4),
+      new THREE.Vector3(cos * 6.05, -2.4, sin * 6.05),
+      new THREE.Vector3(cos * 4.05, -4.8, sin * 4.05),
+    ];
+    const curve = new THREE.CatmullRomCurve3(points);
+    const strut = new THREE.Mesh(
+      new THREE.TubeGeometry(curve, 18, 0.035, 5, false),
+      index % 2 === 0 ? silverMaterial : bronzeMaterial,
     );
-    underside.add(conduit);
+    underside.add(strut);
 
-    const node = new THREE.Mesh(new THREE.SphereGeometry(0.075, 8, 6), material);
-    node.position.copy(top);
-    underside.add(node);
+    points.forEach((point) => {
+      const node = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), silverMaterial);
+      node.position.copy(point);
+      underside.add(node);
+    });
   });
 
-  const tipRing = new THREE.Mesh(new THREE.TorusGeometry(2.42, 0.035, 6, 90), cyanNeonMaterial);
-  tipRing.rotation.x = -Math.PI / 2;
-  tipRing.position.y = -11.2;
-  underside.add(tipRing);
-
-  const tipCore = new THREE.Mesh(
-    new THREE.OctahedronGeometry(0.46, 0),
-    magentaNeonMaterial,
+  const engineHousing = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.56, 1.05, 0.6, 12),
+    silverMaterial,
   );
-  tipCore.position.y = -11.2;
-  underside.add(tipCore);
+  engineHousing.position.y = -6.95;
+  underside.add(engineHousing);
 
-  const tipGlow = new THREE.Sprite(
+  const engineRing = new THREE.Mesh(
+    new THREE.TorusGeometry(0.92, 0.045, 6, 48),
+    warmLightMaterial,
+  );
+  engineRing.rotation.x = Math.PI / 2;
+  engineRing.position.y = -7.17;
+  underside.add(engineRing);
+
+  const engineGlow = new THREE.Sprite(
     new THREE.SpriteMaterial({
       map: glowTexture,
-      color: 0x5be9ff,
+      color: 0xd9f1ff,
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.26,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       fog: false,
       toneMapped: false,
     }),
   );
-  tipGlow.position.y = -12.8;
-  tipGlow.scale.set(4.4, 4.4, 1);
-  underside.add(tipGlow);
+  engineGlow.position.y = -7.55;
+  engineGlow.scale.set(3.2, 3.2, 1);
+  underside.add(engineGlow);
+
+  const underLight = new THREE.PointLight(0xcfe6f2, 11, 22, 2);
+  underLight.position.y = -6.6;
+  group.add(underLight);
 
   function update(time) {
     underRings.forEach((ring, index) => {
-      ring.group.rotation.y = time * (0.045 + index * 0.012);
-      ring.color.emissiveIntensity = 1.8 + Math.sin(time * 1.25 + ring.phase) * 0.45;
+      ring.group.rotation.y = time * (0.018 + index * 0.008);
     });
-
-    beamMaterial.opacity = 0.032 + Math.sin(time * 0.9) * 0.01;
-    beamCoreMaterial.opacity = 0.06 + Math.sin(time * 1.3 + 1) * 0.02;
-    underGlow.material.opacity = 0.24 + Math.sin(time * 1.1) * 0.07;
-    underLight.intensity = 23 + Math.sin(time * 1.1) * 5;
-
-    deckRings.forEach((ring, index) => {
-      ring.mesh.material.emissiveIntensity = 1.5 + Math.sin(time * 1.6 + index * 1.2) * 0.4;
-    });
+    engineGlow.material.opacity = 0.28 + Math.sin(time * 0.7) * 0.05;
+    underLight.intensity = 10 + Math.sin(time * 0.7) * 2;
   }
 
   return { group, rock, deck, update, underside };
@@ -501,50 +435,67 @@ export function createSatellitePlatform(seed) {
   rock.receiveShadow = true;
   group.add(rock);
 
-  const pad = new THREE.Mesh(new THREE.CircleGeometry(7.15, 48), darkMetalMaterial);
+  const pad = new THREE.Mesh(new THREE.CircleGeometry(7.1, 64), ivoryStoneMaterial);
   pad.rotation.x = -Math.PI / 2;
   pad.position.y = CITY_TOP;
   pad.receiveShadow = true;
   group.add(pad);
 
-  const padRing = new THREE.Mesh(new THREE.TorusGeometry(6.4, 0.05, 6, 80), cyanNeonMaterial);
-  padRing.rotation.x = -Math.PI / 2;
-  padRing.position.y = CITY_TOP + 0.03;
-  group.add(padRing);
+  const padRim = new THREE.Mesh(new THREE.TorusGeometry(7.05, 0.07, 6, 110), silverMaterial);
+  padRim.rotation.x = -Math.PI / 2;
+  padRim.position.y = CITY_TOP;
+  group.add(padRim);
 
-  const innerRing = new THREE.Mesh(new THREE.TorusGeometry(2.1, 0.035, 6, 64), magentaNeonMaterial);
-  innerRing.rotation.x = -Math.PI / 2;
-  innerRing.position.y = CITY_TOP + 0.04;
-  group.add(innerRing);
+  const inlay = new THREE.Mesh(new THREE.TorusGeometry(4.4, 0.025, 6, 90), bronzeMaterial);
+  inlay.rotation.x = -Math.PI / 2;
+  inlay.position.y = CITY_TOP + 0.02;
+  group.add(inlay);
 
-  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.26, 4, 8), darkMetalMaterial);
-  mast.position.y = CITY_TOP + 2;
+  const pavilion = new THREE.Group();
+  pavilion.position.set(0.8, CITY_TOP, -0.9);
+  group.add(pavilion);
+
+  const base = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.16, 1.7), ivoryStoneMaterial);
+  base.position.y = 0.08;
+  base.receiveShadow = true;
+  pavilion.add(base);
+
+  const glass = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.05, 1.4), glassMaterial);
+  glass.position.y = 0.7;
+  pavilion.add(glass);
+
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(2.55, 0.1, 1.75), silverMaterial);
+  roof.position.y = 1.28;
+  roof.castShadow = true;
+  pavilion.add(roof);
+
+  const postGeometry = new THREE.BoxGeometry(0.05, 1.05, 0.05);
+  [
+    [-1.0, -0.62],
+    [1.0, -0.62],
+    [-1.0, 0.62],
+    [1.0, 0.62],
+  ].forEach(([x, z]) => {
+    const post = new THREE.Mesh(postGeometry, silverMaterial);
+    post.position.set(x, 0.7, z);
+    pavilion.add(post);
+  });
+
+  const pavilionGlow = new THREE.Mesh(
+    new THREE.BoxGeometry(1.8, 0.02, 0.05),
+    warmLightMaterial,
+  );
+  pavilionGlow.position.set(0, 1.2, 0.6);
+  pavilion.add(pavilionGlow);
+
+  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.075, 3.2, 6), silverMaterial);
+  mast.position.set(-2.3, CITY_TOP + 1.6, 1.1);
   mast.castShadow = true;
   group.add(mast);
 
-  const mastGlow = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 3.4, 6), cyanNeonMaterial);
-  mastGlow.position.y = CITY_TOP + 2.1;
-  group.add(mastGlow);
-
-  const beacon = new THREE.Mesh(new THREE.OctahedronGeometry(0.34, 0), magentaNeonMaterial);
-  beacon.position.y = CITY_TOP + 4.2;
+  const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 8), warmLightMaterial);
+  beacon.position.set(-2.3, CITY_TOP + 3.22, 1.1);
   group.add(beacon);
-
-  const beaconGlow = new THREE.Sprite(
-    new THREE.SpriteMaterial({
-      map: glowTexture,
-      color: 0xff7ce0,
-      transparent: true,
-      opacity: 0.6,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      fog: false,
-      toneMapped: false,
-    }),
-  );
-  beaconGlow.position.y = CITY_TOP + 4.2;
-  beaconGlow.scale.set(2.5, 2.5, 1);
-  group.add(beaconGlow);
 
   return group;
 }
